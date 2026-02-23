@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16
+    container_name: autoflex-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-autoflex}
+      POSTGRES_USER: ${POSTGRES_USER:-autoflex}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-autoflex}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    container_name: autoflex-api
+    depends_on:
+      - db
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/autoflex
+      DB_USER: autoflex
+      DB_PASSWORD: autoflex
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
