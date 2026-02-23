@@ -1,4 +1,7 @@
 package com.projedata.autoflex.domain.repository;
 
-public interface ProductRawMaterialRepository {
+import com.projedata.autoflex.domain.model.ProductRawMaterial;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProductRawMaterialRepository extends JpaRepository<ProductRawMaterial, Long> {
 }
