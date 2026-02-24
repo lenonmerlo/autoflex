@@ -10,3 +10,6 @@
 .alert--error { background: #ffe9e9; border: 1px solid #ffb9b9; }
 button { padding: 10px 12px; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; background: #fafafa; }
 input { padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
+.btn-secondary { opacity: .9; }
+.btn-danger { background: #b42318; color: #fff; }
+.row { display: flex; gap: 8px; align-items: center; }
