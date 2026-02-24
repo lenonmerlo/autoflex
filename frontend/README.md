@@ -1,3 +1,21 @@
+# Autoflex Frontend (React + Vite)
+
+## Rodar
+
+- `npm install`
+- `npm run dev`
+
+## API Base URL
+
+O frontend usa `VITE_API_BASE_URL` (Vite env var) como base URL da API.
+
+- Arquivo local: `frontend/.env`
+- Exemplo: `VITE_API_BASE_URL=http://localhost:8080`
+
+Se a variável não estiver definida, o cliente HTTP faz fallback para `http://localhost:8080`.
+
+---
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
