@@ -31,7 +31,7 @@ public class RawMaterialController {
     @PutMapping("/{id}")
     public RawMaterialDTO update(@PathVariable Long id,
                                  @RequestBody RawMaterialDTO dto) {
-        return service.patch(id, dto);
+        return service.update(id, dto);
     }
 
     @PatchMapping("/{id}")
