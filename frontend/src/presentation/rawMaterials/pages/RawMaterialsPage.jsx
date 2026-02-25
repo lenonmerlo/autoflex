@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-import Alert from "../../shared/components/Alert";
+import ConfirmModal from "../../shared/components/ConfirmModal";
+import Modal from "../../shared/components/Modal";
 import PageLayout from "../../shared/components/PageLayout";
 
 import RawMaterialForm from "../components/RawMaterialForm";
@@ -20,6 +21,7 @@ export default function RawMaterialsPage() {
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   async function load() {
     try {
@@ -64,19 +66,26 @@ export default function RawMaterialsPage() {
   }
 
   async function handleDelete(rawMaterial) {
-    const ok = window.confirm(`Delete raw material "${rawMaterial.name}"?`);
-    if (!ok) return;
+    setConfirmDelete(rawMaterial);
+  }
+
+  async function confirmDeleteRawMaterial() {
+    if (!confirmDelete) return;
 
     try {
-      await deleteRawMaterial(rawMaterial.id);
-      setItems((prev) => prev.filter((rm) => rm.id !== rawMaterial.id));
+      await deleteRawMaterial(confirmDelete.id);
+      setItems((prev) => prev.filter((rm) => rm.id !== confirmDelete.id));
       setSuccess("Raw material deleted successfully.");
     } catch (e) {
       setError(e.message);
+    } finally {
+      setConfirmDelete(null);
     }
   }
 
   function handleEdit(rawMaterial) {
+    setError(null);
+    setSuccess(null);
     setSelected(rawMaterial);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -85,14 +94,46 @@ export default function RawMaterialsPage() {
     setSelected(null);
   }
 
-  return (
-    <PageLayout title="Raw Materials">
-      <p>Manage raw materials stock.</p>
+  const modal = error
+    ? { type: "error", title: "Error", message: error }
+    : success
+      ? { type: "success", title: "Success", message: success }
+      : null;
 
-      {error && <Alert type="error">{error}</Alert>}
-      {success && <Alert type="success">{success}</Alert>}
+  return (
+    <PageLayout title="Raw Materials" subtitle="Manage raw material stock.">
+      <ConfirmModal
+        open={Boolean(confirmDelete)}
+        title="Confirm deletion"
+        message={
+          confirmDelete
+            ? `Delete raw material "${confirmDelete.name}"?`
+            : "Delete raw material?"
+        }
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        confirmVariant="danger"
+        onConfirm={confirmDeleteRawMaterial}
+        onClose={() => setConfirmDelete(null)}
+      />
+
+      <Modal
+        open={Boolean(modal)}
+        title={modal?.title}
+        onClose={() => {
+          setError(null);
+          setSuccess(null);
+        }}
+      >
+        {modal ? (
+          <div className={`modalMessage modalMessage--${modal.type}`}>
+            {modal.message}
+          </div>
+        ) : null}
+      </Modal>
 
       <RawMaterialForm
+        key={selected?.id ?? "new"}
         onSubmit={handleSubmit}
         loading={loadingSave}
         initialValues={selected}
