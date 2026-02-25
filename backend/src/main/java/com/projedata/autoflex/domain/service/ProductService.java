@@ -1,12 +1,14 @@
 package com.projedata.autoflex.domain.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.projedata.autoflex.domain.dto.ProductDTO;
 import com.projedata.autoflex.domain.model.Product;
 import com.projedata.autoflex.domain.repository.ProductRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -14,7 +16,6 @@ public class ProductService {
 
     private final ProductRepository repository;
 
-    //POST
     public ProductDTO create(ProductDTO dto) {
 
         if (repository.existsByCode(dto.code())) {
@@ -48,7 +49,7 @@ public class ProductService {
         return toDTO(product);
     }
 
-    //PUT
+    // PUT
     public ProductDTO update(Long id, ProductDTO dto) {
 
         Product product = repository.findById(id)
@@ -63,7 +64,7 @@ public class ProductService {
         return toDTO(updated);
     }
 
-    //PATCH
+    // PATCH
     public ProductDTO patch(Long id, ProductDTO dto) {
 
         Product product = repository.findById(id)
@@ -78,7 +79,7 @@ public class ProductService {
         return toDTO(updated);
     }
 
-    //DELETE
+    // DELETE
     public void delete(Long id) {
         if (!repository.existsById(id)) {
             throw new RuntimeException("Product not found");

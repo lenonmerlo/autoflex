@@ -39,7 +39,6 @@ a {
   text-decoration: none;
 }
 
-/* App shell */
 .app {
   min-height: 100vh;
   background: var(--bg);
@@ -149,7 +148,6 @@ a {
   gap: 16px;
 }
 
-/* Surfaces / cards */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -172,7 +170,6 @@ a {
   font-weight: 700;
 }
 
-/* Buttons */
 .btn {
   border: 1px solid var(--border);
   background: var(--surface);
@@ -243,7 +240,6 @@ a {
   stroke: currentColor;
 }
 
-/* Forms */
 .formGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -274,7 +270,6 @@ select {
   margin-top: 14px;
 }
 
-/* Tables */
 .tableWrap {
   overflow-x: auto;
 }
@@ -328,7 +323,6 @@ select {
   align-items: center;
 }
 
-/* Alerts */
 .alert {
   padding: 12px 14px;
   border-radius: 12px;
@@ -348,7 +342,6 @@ select {
   color: #14532d;
 }
 
-/* Modal */
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -439,7 +432,6 @@ select {
   gap: 10px;
 }
 
-/* Badges */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -468,7 +460,6 @@ select {
   border-color: #bbf7d0;
 }
 
-/* Stats */
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -493,7 +484,6 @@ select {
   font-size: 12px;
 }
 
-/* Recipes */
 .recipesGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

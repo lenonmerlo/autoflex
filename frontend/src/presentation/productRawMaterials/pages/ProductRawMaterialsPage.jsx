@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import Modal from "../../shared/components/Modal";
 import PageLayout from "../../shared/components/PageLayout";
@@ -19,27 +19,26 @@ export default function ProductRawMaterialsPage() {
     return products.find((p) => p.id === id) ?? null;
   }, [productId, products]);
 
-  async function load() {
+  const load = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await listProducts();
       setProducts(data);
 
-      if (data.length > 0 && !productId) {
-        setProductId(String(data[0].id));
+      if (data.length > 0) {
+        setProductId((prev) => prev || String(data[0].id));
       }
     } catch {
       setError("Could not load products.");
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [load]);
 
   return (
     <PageLayout

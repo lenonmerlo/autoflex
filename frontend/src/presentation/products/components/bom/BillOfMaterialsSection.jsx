@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import ConfirmModal from "../../../shared/components/ConfirmModal";
 import Modal from "../../../shared/components/Modal";
 
@@ -36,7 +36,7 @@ export default function BillOfMaterialsSection({ product }) {
     return map;
   }, [rawMaterials]);
 
-  async function loadAll() {
+  const loadAll = useCallback(async () => {
     if (!productId) return;
     try {
       setLoading(true);
@@ -54,12 +54,11 @@ export default function BillOfMaterialsSection({ product }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [productId]);
 
   useEffect(() => {
     loadAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId]);
+  }, [loadAll]);
 
   async function handleAdd(e) {
     e.preventDefault();

@@ -1,5 +1,9 @@
 package com.projedata.autoflex.domain.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.projedata.autoflex.domain.dto.ProductRawMaterialDTO;
 import com.projedata.autoflex.domain.model.Product;
 import com.projedata.autoflex.domain.model.ProductRawMaterial;
@@ -7,10 +11,8 @@ import com.projedata.autoflex.domain.model.RawMaterial;
 import com.projedata.autoflex.domain.repository.ProductRawMaterialRepository;
 import com.projedata.autoflex.domain.repository.ProductRepository;
 import com.projedata.autoflex.domain.repository.RawMaterialRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +22,6 @@ public class ProductRawMaterialService {
     private final ProductRepository productRepository;
     private final RawMaterialRepository rawMaterialRepository;
 
-    // POST: associa uma matéria-prima a um produto
     public ProductRawMaterialDTO create(ProductRawMaterialDTO dto) {
 
         if (dto.productId() == null) throw new RuntimeException("Product id is required");
@@ -34,7 +35,6 @@ public class ProductRawMaterialService {
         RawMaterial rawMaterial = rawMaterialRepository.findById(dto.rawMaterialId())
                 .orElseThrow(() -> new RuntimeException("Raw material not found"));
 
-        // evita duplicidade: (product + rawMaterial)
         boolean alreadyExists = productRawMaterialRepository
                 .existsByProductIdAndRawMaterialId(product.getId(), rawMaterial.getId());
 
@@ -53,7 +53,7 @@ public class ProductRawMaterialService {
         return toDTO(saved);
     }
 
-    // GET ALL: lista todas associações
+    // GET ALL
     public List<ProductRawMaterialDTO> findAll() {
         return productRawMaterialRepository.findAll()
                 .stream()
@@ -69,7 +69,6 @@ public class ProductRawMaterialService {
         return toDTO(association);
     }
 
-    // GET BY PRODUCT: lista bill of materials de um produto
     public List<ProductRawMaterialDTO> findByProductId(Long productId) {
         if (!productRepository.existsById(productId)) {
             throw new RuntimeException("Product not found");
@@ -81,7 +80,7 @@ public class ProductRawMaterialService {
                 .toList();
     }
 
-    // PUT: atualização completa (inclui trocar rawMaterial e requiredQuantity)
+    // PUT
     public ProductRawMaterialDTO update(Long id, ProductRawMaterialDTO dto) {
 
         ProductRawMaterial association = productRawMaterialRepository.findById(id)
@@ -98,11 +97,9 @@ public class ProductRawMaterialService {
         RawMaterial rawMaterial = rawMaterialRepository.findById(dto.rawMaterialId())
                 .orElseThrow(() -> new RuntimeException("Raw material not found"));
 
-        // evita duplicidade caso troque rawMaterial/produto
         boolean alreadyExists = productRawMaterialRepository
                 .existsByProductIdAndRawMaterialId(product.getId(), rawMaterial.getId());
 
-        // se já existe, mas não é o próprio registro, é duplicado
         if (alreadyExists && !(association.getProduct().getId().equals(product.getId())
                 && association.getRawMaterial().getId().equals(rawMaterial.getId()))) {
             throw new RuntimeException("Raw material already associated with this product");
@@ -117,7 +114,7 @@ public class ProductRawMaterialService {
         return toDTO(updated);
     }
 
-    // PATCH: atualização parcial
+    // PATCH
     public ProductRawMaterialDTO patch(Long id, ProductRawMaterialDTO dto) {
 
         ProductRawMaterial association = productRawMaterialRepository.findById(id)

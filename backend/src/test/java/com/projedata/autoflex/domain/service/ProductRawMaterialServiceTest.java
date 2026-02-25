@@ -1,5 +1,24 @@
 package com.projedata.autoflex.domain.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import com.projedata.autoflex.domain.dto.ProductRawMaterialDTO;
 import com.projedata.autoflex.domain.model.Product;
 import com.projedata.autoflex.domain.model.ProductRawMaterial;
@@ -7,18 +26,6 @@ import com.projedata.autoflex.domain.model.RawMaterial;
 import com.projedata.autoflex.domain.repository.ProductRawMaterialRepository;
 import com.projedata.autoflex.domain.repository.ProductRepository;
 import com.projedata.autoflex.domain.repository.RawMaterialRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class ProductRawMaterialServiceTest {
 
@@ -41,7 +48,6 @@ class ProductRawMaterialServiceTest {
 
     @Test
     void create_shouldCreateAssociation_whenValidAndNotDuplicated() {
-        // Arrange
         ProductRawMaterialDTO dto = new ProductRawMaterialDTO(
                 null,
                 1L,
@@ -65,10 +71,8 @@ class ProductRawMaterialServiceTest {
 
         when(productRawMaterialRepository.save(any(ProductRawMaterial.class))).thenReturn(saved);
 
-        // Act
         ProductRawMaterialDTO result = service.create(dto);
 
-        // Assert
         assertNotNull(result);
         assertEquals(10L, result.id());
         assertEquals(1L, result.productId());
@@ -83,7 +87,6 @@ class ProductRawMaterialServiceTest {
 
     @Test
     void create_shouldThrowException_whenAssociationAlreadyExists() {
-        // Arrange
         ProductRawMaterialDTO dto = new ProductRawMaterialDTO(null, 1L, 2L, new BigDecimal("1.0000"));
 
         Product product = Product.builder().id(1L).build();
@@ -93,7 +96,6 @@ class ProductRawMaterialServiceTest {
         when(rawMaterialRepository.findById(2L)).thenReturn(Optional.of(rawMaterial));
         when(productRawMaterialRepository.existsByProductIdAndRawMaterialId(1L, 2L)).thenReturn(true);
 
-        // Act + Assert
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.create(dto));
         assertEquals("Raw material already associated with this product", ex.getMessage());
 
@@ -102,11 +104,9 @@ class ProductRawMaterialServiceTest {
 
     @Test
     void create_shouldThrowException_whenProductNotFound() {
-        // Arrange
         ProductRawMaterialDTO dto = new ProductRawMaterialDTO(null, 999L, 2L, new BigDecimal("1.0000"));
         when(productRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // Act + Assert
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.create(dto));
         assertEquals("Product not found", ex.getMessage());
 
@@ -116,13 +116,11 @@ class ProductRawMaterialServiceTest {
 
     @Test
     void create_shouldThrowException_whenRawMaterialNotFound() {
-        // Arrange
         ProductRawMaterialDTO dto = new ProductRawMaterialDTO(null, 1L, 999L, new BigDecimal("1.0000"));
 
         when(productRepository.findById(1L)).thenReturn(Optional.of(Product.builder().id(1L).build()));
         when(rawMaterialRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // Act + Assert
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.create(dto));
         assertEquals("Raw material not found", ex.getMessage());
 
@@ -131,7 +129,6 @@ class ProductRawMaterialServiceTest {
 
     @Test
     void patch_shouldUpdateRequiredQuantity_whenProvided() {
-        // Arrange
         Product product = Product.builder().id(1L).build();
         RawMaterial rawMaterial = RawMaterial.builder().id(2L).build();
 
@@ -147,10 +144,8 @@ class ProductRawMaterialServiceTest {
 
         ProductRawMaterialDTO patchDto = new ProductRawMaterialDTO(null, null, null, new BigDecimal("3.0000"));
 
-        // Act
         ProductRawMaterialDTO result = service.patch(10L, patchDto);
 
-        // Assert
         assertEquals(10L, result.id());
         assertEquals(1L, result.productId());
         assertEquals(2L, result.rawMaterialId());
@@ -162,7 +157,6 @@ class ProductRawMaterialServiceTest {
 
     @Test
     void findByProductId_shouldReturnAssociations_whenProductExists() {
-        // Arrange
         when(productRepository.existsById(1L)).thenReturn(true);
 
         Product product = Product.builder().id(1L).build();
@@ -173,10 +167,8 @@ class ProductRawMaterialServiceTest {
 
         when(productRawMaterialRepository.findByProductId(1L)).thenReturn(List.of(a1));
 
-        // Act
         List<ProductRawMaterialDTO> result = service.findByProductId(1L);
 
-        // Assert
         assertEquals(1, result.size());
         assertEquals(10L, result.get(0).id());
         assertEquals(1L, result.get(0).productId());
@@ -188,10 +180,8 @@ class ProductRawMaterialServiceTest {
 
     @Test
     void findByProductId_shouldThrowException_whenProductNotFound() {
-        // Arrange
         when(productRepository.existsById(999L)).thenReturn(false);
 
-        // Act + Assert
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.findByProductId(999L));
         assertEquals("Product not found", ex.getMessage());
 
@@ -200,23 +190,18 @@ class ProductRawMaterialServiceTest {
 
     @Test
     void delete_shouldDelete_whenExists() {
-        // Arrange
         when(productRawMaterialRepository.existsById(10L)).thenReturn(true);
 
-        // Act
         service.delete(10L);
 
-        // Assert
         verify(productRawMaterialRepository).existsById(10L);
         verify(productRawMaterialRepository).deleteById(10L);
     }
 
     @Test
     void delete_shouldThrowException_whenNotExists() {
-        // Arrange
         when(productRawMaterialRepository.existsById(999L)).thenReturn(false);
 
-        // Act + Assert
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.delete(999L));
         assertEquals("Product raw material association not found", ex.getMessage());
 
