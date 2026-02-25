@@ -57,6 +57,34 @@ npm run dev
 
 Open the app at `http://localhost:5173`.
 
+## Demo data (optional, manual)
+
+If you want a clean, evaluator-friendly dataset (for example after running Cypress E2E tests that create `TEST-*` data), you can manually apply the optional seed.
+
+This seed is mounted read-only into the Postgres container at `/seed/seed.sql` and is NOT auto-applied.
+
+If you already have the `db` container running and `/seed/seed.sql` is missing, recreate it so Docker applies the mount:
+
+```bash
+docker compose up -d --force-recreate db
+```
+
+1. Reset containers + DB volume (wipes all data):
+
+```bash
+docker compose down -v && docker compose up -d
+```
+
+2. Apply the seed (wipes tables and recreates demo data):
+
+```bash
+docker compose exec db psql -U postgres -d autoflex -f /seed/seed.sql
+```
+
+If you changed `POSTGRES_USER` or `POSTGRES_DB` in Docker Compose, replace `postgres`/`autoflex` accordingly.
+
+After seeding, `GET /production-suggestions` will clearly show RF004 behavior: products are suggested by highest `price` first, consuming shared raw material stock so lower-value products may end up with fewer (or zero) producible units.
+
 ## Run Locally (No Docker for API)
 
 You can run only the database with Docker and the API locally.
