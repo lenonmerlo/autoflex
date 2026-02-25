@@ -57,6 +57,7 @@ export default function ProductForm({
         <label>
           Code
           <input
+            data-testid="product-code"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="PRD-001"
@@ -66,6 +67,7 @@ export default function ProductForm({
         <label>
           Name
           <input
+            data-testid="product-name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Product name"
@@ -75,6 +77,7 @@ export default function ProductForm({
         <label>
           Price
           <input
+            data-testid="product-price"
             type="number"
             step="0.01"
             min="0"
@@ -86,7 +89,12 @@ export default function ProductForm({
       </div>
 
       <div className="actions">
-        <button className="btn btn-primary" type="submit" disabled={disabled}>
+        <button
+          data-testid="product-submit"
+          className="btn btn-primary"
+          type="submit"
+          disabled={disabled}
+        >
           {loading ? "Saving..." : isEditMode ? "Save changes" : "Create"}
         </button>
       </div>

@@ -36,6 +36,7 @@ export default function ProductTable({ items, onEdit, onDelete, loading }) {
                     <button
                       type="button"
                       className="iconBtn"
+                      data-testid="product-edit"
                       onClick={() => onEdit(p)}
                       aria-label={`Edit product ${p.name}`}
                       title="Edit"
@@ -56,6 +57,7 @@ export default function ProductTable({ items, onEdit, onDelete, loading }) {
                     <button
                       type="button"
                       className="iconBtn iconBtn--danger"
+                      data-testid="product-delete"
                       onClick={() => onDelete(p)}
                       aria-label={`Delete product ${p.name}`}
                       title="Delete"
