@@ -108,7 +108,37 @@ Examples:
 
 - `GET /production-suggestions`
 
-The calculation prioritizes higher unit price products first and consumes shared raw material stock accordingly.
+The calculation prioritizes higher `price` products first and consumes shared raw material stock accordingly.
+
+## Demo data (optional, manual)
+
+The repository includes an optional SQL seed file for manual demo setup:
+
+- File: `src/main/resources/seed.sql`
+- In Docker Compose, it is mounted read-only into the Postgres container at `/seed/seed.sql`
+- It is NOT auto-applied (you apply it manually)
+
+If you already have the `db` container running and `/seed/seed.sql` is missing, recreate it so Docker applies the mount:
+
+```bash
+docker compose up -d --force-recreate db
+```
+
+From repository root:
+
+1. Reset containers + DB volume (wipes all data):
+
+```bash
+docker compose down -v && docker compose up -d
+```
+
+2. Apply the seed (wipes tables and recreates demo data):
+
+```bash
+docker compose exec db psql -U postgres -d autoflex -f /seed/seed.sql
+```
+
+If you changed `POSTGRES_USER` or `POSTGRES_DB` in Docker Compose, replace `postgres`/`autoflex` accordingly.
 
 ## Error Handling
 
