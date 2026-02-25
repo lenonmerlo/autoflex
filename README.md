@@ -21,6 +21,12 @@ This repository contains two separate applications:
 - Frontend: React + Vite + React Router + Axios
 - E2E tests: Cypress
 
+## Requirements
+
+- Java 21 (backend)
+- Node.js `>=20.19 <22` or `>=22.12` (frontend, due to Vite 7)
+- Docker + Docker Compose (optional, recommended for PostgreSQL)
+
 ## Quick Start (Docker)
 
 Requirements: Docker + Docker Compose

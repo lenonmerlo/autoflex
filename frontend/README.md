@@ -7,6 +7,8 @@ Web UI for managing Products, Raw Materials, Product BOM (Product–Raw Material
 - Node.js (LTS recommended)
 - npm
 
+Note: this project uses Vite 7, which requires Node.js `>=20.19 <22` or `>=22.12`.
+
 ## Setup
 
 ```bash
