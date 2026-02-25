@@ -44,6 +44,26 @@ This starts:
 
 The frontend is not containerized in this setup; run it locally (see next section).
 
+## For reviewers
+
+Minimal checklist to validate the practical test quickly:
+
+1. Start DB + API:
+
+```bash
+docker compose up -d
+```
+
+(On first run, you may need `--build`.)
+
+2. (Optional) Load clean demo data:
+
+```bash
+docker compose exec db psql -U postgres -d autoflex -f /seed/seed.sql
+```
+
+3. Open the frontend and validate `Production Suggestions` (shared-stock + price priority).
+
 ### Run Frontend with Docker API
 
 Because the dockerized API is exposed on port `8081`, configure the frontend base URL:
@@ -137,6 +157,54 @@ When running with Docker Compose, the backend container is configured to use the
 ### Frontend environment variables
 
 - `VITE_API_BASE_URL` (default fallback: `http://localhost:8080`)
+
+## Deployment Notes (Optional)
+
+Full deployment is **optional** for this practical test.
+
+For evaluation, the recommended approach is to run everything locally with Docker Compose (database + backend) and run the frontend locally with Vite.
+
+### Frontend-only deploy concept (optional)
+
+If you want a free/low-friction way to publish the UI, you can deploy only the frontend on a static hosting platform.
+
+- In that case, configure the deployed frontend with `VITE_API_BASE_URL` pointing to a reachable backend URL.
+- Note: a publicly hosted frontend cannot call an API running on your local machine (`localhost`) unless you expose it (e.g., via a tunnel or by deploying the backend too).
+
+### Full deploy concept (optional)
+
+This is a conceptual reference only (no deployment is performed/provided here):
+
+- Backend: build and deploy the Docker image to a container platform (examples: Render, Railway, Fly.io)
+- Database: provision a managed PostgreSQL instance (examples: Neon, Supabase)
+- Frontend: deploy the static build to a static hosting platform (example: Vercel)
+
+### Environment variables (real names used in this repository)
+
+Backend (Spring Boot):
+
+- `DB_URL` (includes DB host/port/name, e.g. `jdbc:postgresql://<host>:<port>/<db>`)
+- `DB_USER`
+- `DB_PASSWORD`
+- `CORS_ALLOWED_ORIGINS` (comma-separated)
+
+Docker Compose (database + port mapping):
+
+- `POSTGRES_DB`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `API_PORT` (maps host port -> backend container `8080`)
+
+Frontend (React/Vite):
+
+- `VITE_API_BASE_URL`
+
+### Production considerations (optional)
+
+- CORS: lock `CORS_ALLOWED_ORIGINS` to the real frontend origin(s) only
+- HTTPS: use TLS end-to-end (browser -> frontend host -> API)
+- Logging: ensure structured logs and avoid leaking secrets (DB URLs/passwords) in logs
+- Schema management: this project relies on Hibernate auto-DDL (`ddl-auto: update`) for local evaluation; for production, use a controlled migration strategy instead of auto-updates
 
 ## API Documentation (Swagger)
 
