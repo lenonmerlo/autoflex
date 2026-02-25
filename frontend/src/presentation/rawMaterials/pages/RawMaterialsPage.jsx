@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 
-import PageLayout from "../../shared/components/PageLayout";
 import Alert from "../../shared/components/Alert";
+import PageLayout from "../../shared/components/PageLayout";
 
 import RawMaterialForm from "../components/RawMaterialForm";
 import RawMaterialTable from "../components/RawMaterialTable";
 
-import { listRawMaterials } from "../../../application/rawMaterials/usecases/listRawMaterials";
 import { createRawMaterial } from "../../../application/rawMaterials/usecases/createRawMaterial";
-import { updateRawMaterial } from "../../../application/rawMaterials/usecases/updateRawMaterial";
 import { deleteRawMaterial } from "../../../application/rawMaterials/usecases/deleteRawMaterial";
+import { listRawMaterials } from "../../../application/rawMaterials/usecases/listRawMaterials";
+import { updateRawMaterial } from "../../../application/rawMaterials/usecases/updateRawMaterial";
 
 export default function RawMaterialsPage() {
   const [items, setItems] = useState([]);
@@ -47,7 +47,7 @@ export default function RawMaterialsPage() {
       if (selected?.id) {
         const updated = await updateRawMaterial(selected.id, formData);
         setItems((prev) =>
-          prev.map((rm) => (rm.id === updated.id ? updated : rm))
+          prev.map((rm) => (rm.id === updated.id ? updated : rm)),
         );
         setSelected(null);
         setSuccess("Raw material updated successfully.");
@@ -64,16 +64,12 @@ export default function RawMaterialsPage() {
   }
 
   async function handleDelete(rawMaterial) {
-    const ok = window.confirm(
-      `Delete raw material "${rawMaterial.name}"?`
-    );
+    const ok = window.confirm(`Delete raw material "${rawMaterial.name}"?`);
     if (!ok) return;
 
     try {
       await deleteRawMaterial(rawMaterial.id);
-      setItems((prev) =>
-        prev.filter((rm) => rm.id !== rawMaterial.id)
-      );
+      setItems((prev) => prev.filter((rm) => rm.id !== rawMaterial.id));
       setSuccess("Raw material deleted successfully.");
     } catch (e) {
       setError(e.message);
@@ -90,12 +86,11 @@ export default function RawMaterialsPage() {
   }
 
   return (
-    <PageLayout
-      title="Raw Materials"
-      subtitle="Manage raw materials stock (CRUD)."
-    >
-      {error && <Alert type="error" message={error} />}
-      {success && <Alert type="success" message={success} />}
+    <PageLayout title="Raw Materials">
+      <p>Manage raw materials stock.</p>
+
+      {error && <Alert type="error">{error}</Alert>}
+      {success && <Alert type="success">{success}</Alert>}
 
       <RawMaterialForm
         onSubmit={handleSubmit}
