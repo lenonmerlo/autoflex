@@ -64,6 +64,33 @@ Examples:
 set CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4173
 ```
 
+## Deployment Notes (Optional)
+
+Full deployment is **optional** for this practical test.
+
+For evaluation, the recommended approach is to run the database + API locally using Docker Compose.
+
+### Full deploy concept (optional)
+
+This is a conceptual reference only (no deployment is performed/provided here):
+
+- Backend: deploy the API as a Docker image on a container platform (examples: Render, Railway, Fly.io)
+- Database: use a managed PostgreSQL service (examples: Neon, Supabase)
+
+### Environment variables (real names used in this repository)
+
+- `DB_URL` (includes DB host/port/name, e.g. `jdbc:postgresql://<host>:<port>/<db>`)
+- `DB_USER`
+- `DB_PASSWORD`
+- `CORS_ALLOWED_ORIGINS` (comma-separated)
+
+### Production considerations (optional)
+
+- CORS: set `CORS_ALLOWED_ORIGINS` to the deployed frontend origin(s) only
+- HTTPS: terminate TLS and ensure the API is only reachable via HTTPS
+- Logging: keep logs useful but do not log sensitive values
+- Schema management: this project relies on Hibernate auto-DDL (`ddl-auto: update`) for local evaluation; for production, adopt a controlled migration strategy instead
+
 ## Swagger / OpenAPI
 
 - Swagger UI: `/swagger-ui/index.html`
