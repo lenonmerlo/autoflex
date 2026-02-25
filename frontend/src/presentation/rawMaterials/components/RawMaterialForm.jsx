@@ -57,12 +57,20 @@ export default function RawMaterialForm({
       <div className="formGrid">
         <label>
           Code
-          <input value={code} onChange={(e) => setCode(e.target.value)} />
+          <input
+            data-testid="raw-code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
         </label>
 
         <label>
           Name
-          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <input
+            data-testid="raw-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </label>
 
         <label>
@@ -70,6 +78,8 @@ export default function RawMaterialForm({
           <input
             type="number"
             min="0"
+            step="any"
+            data-testid="raw-stock"
             value={stockQuantity}
             onChange={(e) => setStockQuantity(e.target.value)}
           />
@@ -77,7 +87,12 @@ export default function RawMaterialForm({
       </div>
 
       <div className="actions">
-        <button className="btn btn-primary" type="submit" disabled={disabled}>
+        <button
+          data-testid="raw-submit"
+          className="btn btn-primary"
+          type="submit"
+          disabled={disabled}
+        >
           {loading ? "Saving..." : isEditMode ? "Save changes" : "Create"}
         </button>
       </div>
