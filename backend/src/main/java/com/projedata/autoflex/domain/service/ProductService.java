@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.projedata.autoflex.domain.dto.ProductDTO;
+import com.projedata.autoflex.domain.exception.ConflictException;
+import com.projedata.autoflex.domain.exception.NotFoundException;
 import com.projedata.autoflex.domain.model.Product;
 import com.projedata.autoflex.domain.repository.ProductRepository;
 
@@ -19,7 +21,7 @@ public class ProductService {
     public ProductDTO create(ProductDTO dto) {
 
         if (repository.existsByCode(dto.code())) {
-            throw new RuntimeException("Product code already exists");
+            throw new ConflictException("Product code already exists");
         }
 
         Product product = Product.builder()
@@ -44,7 +46,7 @@ public class ProductService {
     // GET BY ID
     public ProductDTO findById(Long id) {
         Product product = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
 
         return toDTO(product);
     }
@@ -53,7 +55,7 @@ public class ProductService {
     public ProductDTO update(Long id, ProductDTO dto) {
 
         Product product = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
 
         product.setCode(dto.code());
         product.setName(dto.name());
@@ -68,7 +70,7 @@ public class ProductService {
     public ProductDTO patch(Long id, ProductDTO dto) {
 
         Product product = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
 
         if (dto.code() != null) product.setCode(dto.code());
         if (dto.name() != null) product.setName(dto.name());
@@ -82,7 +84,7 @@ public class ProductService {
     // DELETE
     public void delete(Long id) {
         if (!repository.existsById(id)) {
-            throw new RuntimeException("Product not found");
+            throw new NotFoundException("Product not found");
         }
         repository.deleteById(id);
     }
