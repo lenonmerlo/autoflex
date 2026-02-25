@@ -10,7 +10,8 @@ import { createProduct } from "../../../application/products/usecases/createProd
 import { deleteProduct } from "../../../application/products/usecases/deleteProduct";
 import { listProducts } from "../../../application/products/usecases/listProducts";
 import { updateProduct } from "../../../application/products/usecases/updateProduct";
-import { productRepository } from "../../../infrastructure/repositories/productRepository";
+
+import BillOfMaterialsSection from "../components/bom/BillOfMaterialsSection";
 
 export default function ProductsPage() {
   const [items, setItems] = useState([]);
@@ -26,7 +27,7 @@ export default function ProductsPage() {
     try {
       setLoadingList(true);
       setError(null);
-      const data = await listProducts(productRepository);
+      const data = await listProducts();
       setItems(data);
     } catch {
       setError("Could not load products.");
@@ -53,7 +54,7 @@ export default function ProductsPage() {
         setSelected(null);
         setSuccess("Product updated successfully.");
       } else {
-        const created = await createProduct(productRepository, formData);
+        const created = await createProduct(formData);
         setItems((prev) => [created, ...prev]);
         setSuccess("Product created successfully.");
       }
@@ -95,7 +96,7 @@ export default function ProductsPage() {
 
   return (
     <PageLayout title="Products">
-      <p>Manage products catalog (CRUD).</p>
+      <p>Manage products catalog.</p>
 
       {error && <Alert type="error">{error}</Alert>}
       {success && <Alert type="success">{success}</Alert>}
@@ -107,7 +108,7 @@ export default function ProductsPage() {
         initialValues={selected}
         onCancelEdit={handleCancelEdit}
       />
-
+      {selected?.id && <BillOfMaterialsSection product={selected} />}
       <ProductTable
         items={items}
         loading={loadingList}
