@@ -1,34 +1,84 @@
 # Autoflex Frontend (React + Vite)
 
-## Rodar
+Web UI for managing Products, Raw Materials, Product BOM (Product–Raw Material), and Production Suggestions.
 
-- `npm install`
-- `npm run dev`
+## Requirements
 
-## API Base URL
+- Node.js (LTS recommended)
+- npm
 
-O frontend usa `VITE_API_BASE_URL` (Vite env var) como base URL da API.
+## Setup
 
-- Arquivo local: `frontend/.env`
-- Exemplo: `VITE_API_BASE_URL=http://localhost:8080`
+```bash
+npm install
+```
 
-Se a variável não estiver definida, o cliente HTTP faz fallback para `http://localhost:8080`.
+## Run (development)
 
----
+```bash
+npm run dev
+```
 
-# React + Vite
+Default URL: `http://localhost:5173`
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## API base URL
 
-Currently, two official plugins are available:
+The frontend uses the Vite environment variable `VITE_API_BASE_URL` as the API base URL.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Create `frontend/.env` (example for local backend on port 8080):
 
-## React Compiler
+```bash
+VITE_API_BASE_URL=http://localhost:8080
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+If `VITE_API_BASE_URL` is not defined, the HTTP client falls back to `http://localhost:8080`.
 
-## Expanding the ESLint configuration
+### Using the backend via Docker Compose
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+In this repository, Docker Compose exposes the backend API on `http://localhost:8081` by default.
+
+Create/update `frontend/.env`:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8081
+```
+
+## Available routes
+
+- `/products`: Products CRUD + BOM section
+- `/raw-materials`: Raw materials CRUD
+- `/product-raw-materials`: Manage BOM associations
+- `/production-suggestions`: Production suggestions listing (prioritizes higher-value products)
+
+## Scripts
+
+- `npm run dev`: start dev server
+- `npm run build`: production build
+- `npm run preview`: preview production build
+- `npm run lint`: run ESLint
+- `npm run test:e2e`: run Cypress E2E (headless)
+
+## E2E tests (Cypress)
+
+Requirements:
+
+- Backend running (local or Docker)
+- Frontend running (`npm run dev`) or Cypress configured to start it
+
+Run:
+
+```bash
+npm run test:e2e
+```
+
+## Notes about credentials / sensitive defaults (evaluation)
+
+For evaluation convenience, this project includes local defaults (ports and endpoints) and Docker Compose defaults.
+
+In a real environment, sensitive values must not be committed to the repository and should be provided via secret management and environment-specific configuration.
+
+## License
+
+This repository is **proprietary evaluation material** for Projetada. No permission is granted to copy, modify, or redistribute it.
+
+See [../LICENSE](../LICENSE).
