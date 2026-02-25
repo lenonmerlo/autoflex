@@ -13,3 +13,16 @@ input { padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
 .btn-secondary { opacity: .9; }
 .btn-danger { background: #b42318; color: #fff; }
 .row { display: flex; gap: 8px; align-items: center; }
+select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  width: 100%;
+}
+.summary-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
