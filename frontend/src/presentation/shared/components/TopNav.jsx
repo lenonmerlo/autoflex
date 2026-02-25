@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 function IconBox(props) {
@@ -86,29 +87,72 @@ const navItems = [
 ];
 
 export default function TopNav() {
+  const tabsRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  useEffect(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const maxScrollLeft = el.scrollWidth - el.clientWidth;
+      const left = el.scrollLeft;
+
+      setCanScrollLeft(left > 0);
+      setCanScrollRight(maxScrollLeft > 1 && left < maxScrollLeft - 1);
+    };
+
+    update();
+
+    const onScroll = () => update();
+    const onResize = () => update();
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
   return (
     <header className="topbar">
       <div className="topbar__inner">
         <div className="topbar__title">Inventory Management System</div>
 
-        <nav className="tabs" aria-label="Primary navigation">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                ["tabs__item", isActive ? "tabs__item--active" : ""]
-                  .filter(Boolean)
-                  .join(" ")
-              }
-            >
-              <span className="tabs__icon">
-                <item.Icon />
-              </span>
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
+        <div className="tabsWrap">
+          {canScrollLeft ? <span className="tabsFade tabsFade--left" /> : null}
+          {canScrollRight ? (
+            <span className="tabsFade tabsFade--right" />
+          ) : null}
+          {canScrollLeft ? (
+            <span className="tabsHint tabsHint--left" aria-hidden="true" />
+          ) : null}
+          {canScrollRight ? (
+            <span className="tabsHint tabsHint--right" aria-hidden="true" />
+          ) : null}
+
+          <nav ref={tabsRef} className="tabs" aria-label="Primary navigation">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  ["tabs__item", isActive ? "tabs__item--active" : ""]
+                    .filter(Boolean)
+                    .join(" ")
+                }
+              >
+                <span className="tabs__icon">
+                  <item.Icon />
+                </span>
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
       </div>
     </header>
   );
