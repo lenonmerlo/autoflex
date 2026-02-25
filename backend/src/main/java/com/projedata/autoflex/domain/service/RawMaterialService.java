@@ -1,12 +1,14 @@
 package com.projedata.autoflex.domain.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.projedata.autoflex.domain.dto.RawMaterialDTO;
 import com.projedata.autoflex.domain.model.RawMaterial;
 import com.projedata.autoflex.domain.repository.RawMaterialRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -14,7 +16,6 @@ public class RawMaterialService {
 
     private final RawMaterialRepository repository;
 
-    // POST
     public RawMaterialDTO create(RawMaterialDTO dto) {
         if (repository.existsByCode(dto.code())) {
             throw new RuntimeException("Raw material code already exists");
@@ -30,7 +31,7 @@ public class RawMaterialService {
         return toDTO(saved);
     }
 
-    //GET ALL
+    // GET ALL
     public List<RawMaterialDTO> findAll() {
         return repository.findAll()
                 .stream()
@@ -38,7 +39,7 @@ public class RawMaterialService {
                 .toList();
     }
 
-    //GET BY ID
+    // GET BY ID
     public RawMaterialDTO findById(Long id) {
         RawMaterial rawMaterial = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Raw material not found"));
@@ -46,7 +47,7 @@ public class RawMaterialService {
         return toDTO(rawMaterial);
     }
 
-    //PUT
+    // PUT
     public RawMaterialDTO update(Long id, RawMaterialDTO dto) {
         RawMaterial rawMaterial = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Raw material not found"));
@@ -60,7 +61,7 @@ public class RawMaterialService {
         return toDTO(updated);
     }
 
-    //PATCH
+    // PATCH
     public RawMaterialDTO patch(Long id, RawMaterialDTO dto) {
         RawMaterial rawMaterial = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Raw material not found"));
