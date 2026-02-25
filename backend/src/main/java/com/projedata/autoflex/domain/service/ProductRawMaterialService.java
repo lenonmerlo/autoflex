@@ -5,6 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.projedata.autoflex.domain.dto.ProductRawMaterialDTO;
+import com.projedata.autoflex.domain.exception.BadRequestException;
+import com.projedata.autoflex.domain.exception.ConflictException;
+import com.projedata.autoflex.domain.exception.NotFoundException;
 import com.projedata.autoflex.domain.model.Product;
 import com.projedata.autoflex.domain.model.ProductRawMaterial;
 import com.projedata.autoflex.domain.model.RawMaterial;
@@ -24,22 +27,22 @@ public class ProductRawMaterialService {
 
     public ProductRawMaterialDTO create(ProductRawMaterialDTO dto) {
 
-        if (dto.productId() == null) throw new RuntimeException("Product id is required");
-        if (dto.rawMaterialId() == null) throw new RuntimeException("Raw material id is required");
-        if (dto.requiredQuantity() == null) throw new RuntimeException("Required quantity is required");
-        if (dto.requiredQuantity().signum() <= 0) throw new RuntimeException("Required quantity must be greater than zero");
+                if (dto.productId() == null) throw new BadRequestException("Product id is required");
+                if (dto.rawMaterialId() == null) throw new BadRequestException("Raw material id is required");
+                if (dto.requiredQuantity() == null) throw new BadRequestException("Required quantity is required");
+                if (dto.requiredQuantity().signum() <= 0) throw new BadRequestException("Required quantity must be greater than zero");
 
         Product product = productRepository.findById(dto.productId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
 
         RawMaterial rawMaterial = rawMaterialRepository.findById(dto.rawMaterialId())
-                .orElseThrow(() -> new RuntimeException("Raw material not found"));
+                .orElseThrow(() -> new NotFoundException("Raw material not found"));
 
         boolean alreadyExists = productRawMaterialRepository
                 .existsByProductIdAndRawMaterialId(product.getId(), rawMaterial.getId());
 
         if (alreadyExists) {
-            throw new RuntimeException("Raw material already associated with this product");
+                        throw new ConflictException("Raw material already associated with this product");
         }
 
         ProductRawMaterial association = ProductRawMaterial.builder()
@@ -64,14 +67,14 @@ public class ProductRawMaterialService {
     // GET BY ID
     public ProductRawMaterialDTO findById(Long id) {
         ProductRawMaterial association = productRawMaterialRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product raw material association not found"));
+                                .orElseThrow(() -> new NotFoundException("Product raw material association not found"));
 
         return toDTO(association);
     }
 
     public List<ProductRawMaterialDTO> findByProductId(Long productId) {
         if (!productRepository.existsById(productId)) {
-            throw new RuntimeException("Product not found");
+                        throw new NotFoundException("Product not found");
         }
 
         return productRawMaterialRepository.findByProductId(productId)
@@ -84,25 +87,25 @@ public class ProductRawMaterialService {
     public ProductRawMaterialDTO update(Long id, ProductRawMaterialDTO dto) {
 
         ProductRawMaterial association = productRawMaterialRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product raw material association not found"));
+                .orElseThrow(() -> new NotFoundException("Product raw material association not found"));
 
-        if (dto.productId() == null) throw new RuntimeException("Product id is required");
-        if (dto.rawMaterialId() == null) throw new RuntimeException("Raw material id is required");
-        if (dto.requiredQuantity() == null) throw new RuntimeException("Required quantity is required");
-        if (dto.requiredQuantity().signum() <= 0) throw new RuntimeException("Required quantity must be greater than zero");
+        if (dto.productId() == null) throw new BadRequestException("Product id is required");
+        if (dto.rawMaterialId() == null) throw new BadRequestException("Raw material id is required");
+        if (dto.requiredQuantity() == null) throw new BadRequestException("Required quantity is required");
+        if (dto.requiredQuantity().signum() <= 0) throw new BadRequestException("Required quantity must be greater than zero");
 
         Product product = productRepository.findById(dto.productId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
 
         RawMaterial rawMaterial = rawMaterialRepository.findById(dto.rawMaterialId())
-                .orElseThrow(() -> new RuntimeException("Raw material not found"));
+                .orElseThrow(() -> new NotFoundException("Raw material not found"));
 
         boolean alreadyExists = productRawMaterialRepository
                 .existsByProductIdAndRawMaterialId(product.getId(), rawMaterial.getId());
 
         if (alreadyExists && !(association.getProduct().getId().equals(product.getId())
                 && association.getRawMaterial().getId().equals(rawMaterial.getId()))) {
-            throw new RuntimeException("Raw material already associated with this product");
+                        throw new ConflictException("Raw material already associated with this product");
         }
 
         association.setProduct(product);
@@ -118,10 +121,10 @@ public class ProductRawMaterialService {
     public ProductRawMaterialDTO patch(Long id, ProductRawMaterialDTO dto) {
 
         ProductRawMaterial association = productRawMaterialRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product raw material association not found"));
+                                .orElseThrow(() -> new NotFoundException("Product raw material association not found"));
 
         if (dto.requiredQuantity() != null) {
-            if (dto.requiredQuantity().signum() <= 0) throw new RuntimeException("Required quantity must be greater than zero");
+                        if (dto.requiredQuantity().signum() <= 0) throw new BadRequestException("Required quantity must be greater than zero");
             association.setRequiredQuantity(dto.requiredQuantity());
         }
 
@@ -130,17 +133,17 @@ public class ProductRawMaterialService {
             Long newRawMaterialId = dto.rawMaterialId() != null ? dto.rawMaterialId() : association.getRawMaterial().getId();
 
             Product product = productRepository.findById(newProductId)
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+                    .orElseThrow(() -> new NotFoundException("Product not found"));
 
             RawMaterial rawMaterial = rawMaterialRepository.findById(newRawMaterialId)
-                    .orElseThrow(() -> new RuntimeException("Raw material not found"));
+                    .orElseThrow(() -> new NotFoundException("Raw material not found"));
 
             boolean alreadyExists = productRawMaterialRepository
                     .existsByProductIdAndRawMaterialId(product.getId(), rawMaterial.getId());
 
             if (alreadyExists && !(association.getProduct().getId().equals(product.getId())
                     && association.getRawMaterial().getId().equals(rawMaterial.getId()))) {
-                throw new RuntimeException("Raw material already associated with this product");
+                                throw new ConflictException("Raw material already associated with this product");
             }
 
             association.setProduct(product);
@@ -155,7 +158,7 @@ public class ProductRawMaterialService {
     // DELETE
     public void delete(Long id) {
         if (!productRawMaterialRepository.existsById(id)) {
-            throw new RuntimeException("Product raw material association not found");
+                        throw new NotFoundException("Product raw material association not found");
         }
         productRawMaterialRepository.deleteById(id);
     }
