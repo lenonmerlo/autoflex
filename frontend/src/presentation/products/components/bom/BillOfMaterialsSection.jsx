@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import Alert from "../../../shared/components/Alert";
+import ConfirmModal from "../../../shared/components/ConfirmModal";
+import Modal from "../../../shared/components/Modal";
 
-import { listRawMaterials } from "../../../../application/rawMaterials/usecases/listRawMaterials";
-import { listProductRawMaterialsByProduct } from "../../../../application/productRawMaterials/usecases/listProductRawMaterialsByProduct";
 import { createProductRawMaterial } from "../../../../application/productRawMaterials/usecases/createProductRawMaterial";
-import { updateProductRawMaterial } from "../../../../application/productRawMaterials/usecases/updateProductRawMaterial";
 import { deleteProductRawMaterial } from "../../../../application/productRawMaterials/usecases/deleteProductRawMaterial";
+import { listProductRawMaterialsByProduct } from "../../../../application/productRawMaterials/usecases/listProductRawMaterialsByProduct";
+import { updateProductRawMaterial } from "../../../../application/productRawMaterials/usecases/updateProductRawMaterial";
+import { listRawMaterials } from "../../../../application/rawMaterials/usecases/listRawMaterials";
 
 export default function BillOfMaterialsSection({ product }) {
   const productId = product?.id;
@@ -21,6 +22,13 @@ export default function BillOfMaterialsSection({ product }) {
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [confirmRemove, setConfirmRemove] = useState(null);
+
+  const modal = error
+    ? { type: "error", title: "Error", message: error }
+    : success
+      ? { type: "success", title: "Success", message: success }
+      : null;
 
   const rawMaterialsMap = useMemo(() => {
     const map = new Map();
@@ -98,23 +106,30 @@ export default function BillOfMaterialsSection({ product }) {
     }
   }
 
-  async function handleRemove(item) {
+  function handleRemove(item) {
     const rm = rawMaterialsMap.get(item.rawMaterialId);
-    const ok = window.confirm(`Remove "${rm?.name ?? "raw material"}" from this product?`);
-    if (!ok) return;
+    setConfirmRemove({
+      item,
+      rawMaterialName: rm?.name ?? "raw material",
+    });
+  }
+
+  async function confirmRemoveAssociation() {
+    if (!confirmRemove?.item) return;
 
     try {
       setSaving(true);
       setError(null);
       setSuccess(null);
 
-      await deleteProductRawMaterial(item.id);
-      setItems((prev) => prev.filter((x) => x.id !== item.id));
+      await deleteProductRawMaterial(confirmRemove.item.id);
+      setItems((prev) => prev.filter((x) => x.id !== confirmRemove.item.id));
       setSuccess("Association removed.");
     } catch (e) {
       setError(e?.message || "Could not remove association.");
     } finally {
       setSaving(false);
+      setConfirmRemove(null);
     }
   }
 
@@ -122,46 +137,90 @@ export default function BillOfMaterialsSection({ product }) {
 
   return (
     <div className="card">
-      <div className="card-header">
-        <h3>Bill of Materials (BOM)</h3>
+      <div className="cardHeader">
+        <h3 className="cardTitle">Bill of Materials (BOM)</h3>
       </div>
 
-      {error && <Alert type="error" message={error} />}
-      {success && <Alert type="success" message={success} />}
+      <ConfirmModal
+        open={Boolean(confirmRemove)}
+        title="Confirm removal"
+        message={
+          confirmRemove
+            ? `Remove "${confirmRemove.rawMaterialName}" from this product?`
+            : "Remove raw material from this product?"
+        }
+        confirmLabel="Remove"
+        cancelLabel="Cancel"
+        confirmVariant="danger"
+        onConfirm={confirmRemoveAssociation}
+        onClose={() => setConfirmRemove(null)}
+      />
 
-      <form onSubmit={handleAdd} className="grid">
-        <label>
-          Raw Material
-          <select value={rawMaterialId} onChange={(e) => setRawMaterialId(e.target.value)}>
-            <option value="">Select...</option>
-            {rawMaterials.map((rm) => (
-              <option key={rm.id} value={rm.id}>
-                {rm.code} - {rm.name}
-              </option>
-            ))}
-          </select>
-        </label>
+      <Modal
+        open={Boolean(modal)}
+        title={modal?.title}
+        onClose={() => {
+          setError(null);
+          setSuccess(null);
+        }}
+      >
+        {modal ? (
+          <div className={`modalMessage modalMessage--${modal.type}`}>
+            {modal.message}
+          </div>
+        ) : null}
+      </Modal>
 
-        <label>
-          Required Quantity
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={requiredQuantity}
-            onChange={(e) => setRequiredQuantity(e.target.value)}
-            placeholder="e.g. 2"
-          />
-        </label>
+      <form onSubmit={handleAdd}>
+        <div className="formGrid">
+          <label>
+            Raw Material
+            <select
+              value={rawMaterialId}
+              onChange={(e) => setRawMaterialId(e.target.value)}
+            >
+              <option value="">Select...</option>
+              {rawMaterials.map((rm) => (
+                <option key={rm.id} value={rm.id}>
+                  {rm.code} - {rm.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Required Quantity
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={requiredQuantity}
+              onChange={(e) => setRequiredQuantity(e.target.value)}
+              placeholder="e.g. 2"
+            />
+          </label>
+        </div>
 
         <div className="actions">
           <button
+            className="btn btn-primary"
             type="submit"
-            disabled={saving || loading || !rawMaterialId || requiredQuantity === "" || Number(requiredQuantity) <= 0}
+            disabled={
+              saving ||
+              loading ||
+              !rawMaterialId ||
+              requiredQuantity === "" ||
+              Number(requiredQuantity) <= 0
+            }
           >
             {saving ? "Saving..." : "Add"}
           </button>
-          <button type="button" className="btn-secondary" onClick={loadAll} disabled={loading}>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={loadAll}
+            disabled={loading}
+          >
             {loading ? "Loading..." : "Refresh"}
           </button>
         </div>
@@ -172,14 +231,14 @@ export default function BillOfMaterialsSection({ product }) {
       ) : items.length === 0 ? (
         <p>No raw materials associated with this product.</p>
       ) : (
-        <div className="table-wrap">
+        <div className="tableWrap">
           <table className="table">
             <thead>
               <tr>
                 <th>ID</th>
                 <th>Raw Material</th>
                 <th>Required Quantity</th>
-                <th style={{ width: 140 }}>Actions</th>
+                <th className="colActions">Actions</th>
               </tr>
             </thead>
 
@@ -190,7 +249,9 @@ export default function BillOfMaterialsSection({ product }) {
                   <tr key={it.id}>
                     <td>{it.id}</td>
                     <td>
-                      {rm ? `${rm.code} - ${rm.name}` : `RawMaterial #${it.rawMaterialId}`}
+                      {rm
+                        ? `${rm.code} - ${rm.name}`
+                        : `RawMaterial #${it.rawMaterialId}`}
                     </td>
                     <td>
                       <input
@@ -200,7 +261,11 @@ export default function BillOfMaterialsSection({ product }) {
                         defaultValue={it.requiredQuantity}
                         onBlur={(e) => {
                           const newQty = Number(e.target.value);
-                          if (!Number.isNaN(newQty) && newQty > 0 && newQty !== it.requiredQuantity) {
+                          if (
+                            !Number.isNaN(newQty) &&
+                            newQty > 0 &&
+                            newQty !== it.requiredQuantity
+                          ) {
                             handleUpdateRequired(it, newQty);
                           } else {
                             e.target.value = it.requiredQuantity;
@@ -208,10 +273,32 @@ export default function BillOfMaterialsSection({ product }) {
                         }}
                       />
                     </td>
-                    <td className="row">
-                      <button className="btn-danger" onClick={() => handleRemove(it)} disabled={saving}>
-                        Remove
-                      </button>
+                    <td className="colActions">
+                      <div className="rowActions">
+                        <button
+                          type="button"
+                          className="iconBtn iconBtn--danger"
+                          onClick={() => handleRemove(it)}
+                          disabled={saving}
+                          aria-label={`Remove raw material from product`}
+                          title="Remove"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d="M3 6h18" />
+                            <path d="M8 6V4h8v2" />
+                            <path d="M19 6l-1 14H6L5 6" />
+                            <path d="M10 11v6" />
+                            <path d="M14 11v6" />
+                          </svg>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

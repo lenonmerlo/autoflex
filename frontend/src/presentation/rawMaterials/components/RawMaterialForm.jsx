@@ -39,12 +39,14 @@ export default function RawMaterialForm({
 
   return (
     <form className="card" onSubmit={handleSubmit}>
-      <div className="card-header">
-        <h3>{isEditMode ? "Edit raw material" : "Create raw material"}</h3>
+      <div className="cardHeader">
+        <h3 className="cardTitle">
+          {isEditMode ? "Edit raw material" : "Create raw material"}
+        </h3>
         {isEditMode && onCancelEdit && (
           <button
             type="button"
-            className="btn-secondary"
+            className="btn btn-secondary"
             onClick={onCancelEdit}
           >
             Cancel
@@ -52,7 +54,7 @@ export default function RawMaterialForm({
         )}
       </div>
 
-      <div className="grid">
+      <div className="formGrid">
         <label>
           Code
           <input value={code} onChange={(e) => setCode(e.target.value)} />
@@ -75,7 +77,7 @@ export default function RawMaterialForm({
       </div>
 
       <div className="actions">
-        <button type="submit" disabled={disabled}>
+        <button className="btn btn-primary" type="submit" disabled={disabled}>
           {loading ? "Saving..." : isEditMode ? "Save changes" : "Create"}
         </button>
       </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-import Alert from "../../shared/components/Alert";
+import ConfirmModal from "../../shared/components/ConfirmModal";
+import Modal from "../../shared/components/Modal";
 import PageLayout from "../../shared/components/PageLayout";
 
 import ProductForm from "../components/ProductForm";
@@ -22,6 +23,7 @@ export default function ProductsPage() {
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   async function load() {
     try {
@@ -66,20 +68,25 @@ export default function ProductsPage() {
   }
 
   async function handleDelete(product) {
-    const ok = window.confirm(`Delete product "${product.name}"?`);
-    if (!ok) return;
+    setConfirmDelete(product);
+  }
+
+  async function confirmDeleteProduct() {
+    if (!confirmDelete) return;
 
     try {
       setError(null);
       setSuccess(null);
 
-      await deleteProduct(product.id);
-      setItems((prev) => prev.filter((p) => p.id !== product.id));
+      await deleteProduct(confirmDelete.id);
+      setItems((prev) => prev.filter((p) => p.id !== confirmDelete.id));
 
-      if (selected?.id === product.id) setSelected(null);
+      if (selected?.id === confirmDelete.id) setSelected(null);
       setSuccess("Product deleted successfully.");
     } catch (e) {
       setError(e?.message || "Could not delete product.");
+    } finally {
+      setConfirmDelete(null);
     }
   }
 
@@ -94,12 +101,43 @@ export default function ProductsPage() {
     setSelected(null);
   }
 
-  return (
-    <PageLayout title="Products">
-      <p>Manage products catalog.</p>
+  const modal = error
+    ? { type: "error", title: "Error", message: error }
+    : success
+      ? { type: "success", title: "Success", message: success }
+      : null;
 
-      {error && <Alert type="error">{error}</Alert>}
-      {success && <Alert type="success">{success}</Alert>}
+  return (
+    <PageLayout title="Products" subtitle="Manage your registered products.">
+      <ConfirmModal
+        open={Boolean(confirmDelete)}
+        title="Confirm deletion"
+        message={
+          confirmDelete
+            ? `Delete product "${confirmDelete.name}"?`
+            : "Delete product?"
+        }
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        confirmVariant="danger"
+        onConfirm={confirmDeleteProduct}
+        onClose={() => setConfirmDelete(null)}
+      />
+
+      <Modal
+        open={Boolean(modal)}
+        title={modal?.title}
+        onClose={() => {
+          setError(null);
+          setSuccess(null);
+        }}
+      >
+        {modal ? (
+          <div className={`modalMessage modalMessage--${modal.type}`}>
+            {modal.message}
+          </div>
+        ) : null}
+      </Modal>
 
       <ProductForm
         key={selected?.id ?? "new"}

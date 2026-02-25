@@ -37,12 +37,14 @@ export default function ProductForm({
 
   return (
     <form className="card" onSubmit={handleSubmit}>
-      <div className="card-header">
-        <h3>{isEditMode ? "Edit product" : "Create product"}</h3>
+      <div className="cardHeader">
+        <h3 className="cardTitle">
+          {isEditMode ? "Edit product" : "Create product"}
+        </h3>
         {isEditMode && onCancelEdit && (
           <button
             type="button"
-            className="btn-secondary"
+            className="btn btn-secondary"
             onClick={onCancelEdit}
             disabled={loading}
           >
@@ -51,7 +53,7 @@ export default function ProductForm({
         )}
       </div>
 
-      <div className="grid">
+      <div className="formGrid">
         <label>
           Code
           <input
@@ -84,7 +86,7 @@ export default function ProductForm({
       </div>
 
       <div className="actions">
-        <button type="submit" disabled={disabled}>
+        <button className="btn btn-primary" type="submit" disabled={disabled}>
           {loading ? "Saving..." : isEditMode ? "Save changes" : "Create"}
         </button>
       </div>
