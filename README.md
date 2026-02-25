@@ -64,6 +64,14 @@ docker compose exec db psql -U postgres -d autoflex -f /seed/seed.sql
 
 3. Open the frontend and validate `Production Suggestions` (shared-stock + price priority).
 
+## Documentation assets (optional)
+
+If you want a quick visual reference (without embedding images in this README), see the `docs/` folder:
+
+- Architecture overview: `docs/architecture-overview.png`
+- UI (Production Suggestions): `docs/production-suggestions.png`
+- UI (Products): `docs/products.png`
+
 ### Run Frontend with Docker API
 
 Because the dockerized API is exposed on port `8081`, configure the frontend base URL:
